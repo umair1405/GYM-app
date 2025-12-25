@@ -1,0 +1,22 @@
+{
+  "app": {
+    "name": "GYM App Backend",
+    "version": "1.0.0",
+    "debug": true
+  },
+
+  "database": {
+    "engine": "postgresql",
+    "host": "localhost",
+    "port": 5432,
+    "user": "postgres",
+    "password": "YOUR_PASSWORD_HERE",
+    "name": "gym"
+  },
+
+  "security": {
+    "jwt_secret_key": "CHANGE_ME_TO_A_RANDOM_SECRET",
+    "jwt_algorithm": "HS256",
+    "access_token_expire_minutes": 60
+  }
+}
