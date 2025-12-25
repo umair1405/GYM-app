@@ -5,11 +5,11 @@ from datetime import datetime
 
 class User(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True)
-    email = Column(String, unique=True)
-    password = Column(String)
-    name = Column(String)
-
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    password = Column(String, nullable=False)
+   
+    
 class Attendance(Base):
     __tablename__ = "attendance"
     id = Column(Integer, primary_key=True)
@@ -29,3 +29,15 @@ class Exercise(Base):
     name = Column(String)
     image_url = Column(String)
     description = Column(String)
+
+class Workout(Base):
+    __tablename__ = "workout"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    description = Column(String)
+    photo_url = Column(String)
+    category_id = Column(Integer, ForeignKey("workout_category.id"))
+
+    category = relationship("WorkoutCategory")
+

@@ -1,11 +1,21 @@
-from fastapi import APIRouter, Depends, Form
+# backend/routers/auth.py
+from fastapi import APIRouter, Depends, HTTPException
+'''from pydantic import BaseModel
 from passlib.hash import bcrypt
 from sqlalchemy.orm import Session
 from database import SessionLocal
-import models
+import models    by monu'''
 
-router = APIRouter(prefix="/auth")
+from sqlalchemy.orm import Session
+import models, schemas
+from database import engine, SessionLocal
+from utils import hash_password
+from utils import verify_password
+from fastapi import status
 
+
+
+router = APIRouter(prefix="/auth", tags=["auth"])
 def get_db():
     db = SessionLocal()
     try:
@@ -13,15 +23,64 @@ def get_db():
     finally:
         db.close()
 
+
+
+'''class LoginRequest(BaseModel):
+    email: str
+    password: str'''
+'''
 @router.post("/login")
-def login(
-    email: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db)
-):
-    user = db.query(models.User).filter(models.User.email == email).first()
+def login(req: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.email == req.email).first()
+    if not user:
+        # Use HTTPException or structured JSON — keep consistent
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    if not bcrypt.verify(req.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    if user and bcrypt.verify(password, user.password):
-        return {"status": "success", "user_id": user.id, "name": user.name}
+    # return minimal user info; you may later add JWT token here
+    return {"status": "success", "user_id": user.id, "name": user.name} by monu
+ '''
+ 
+ 
+@router.post("/register")
+def register_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    # Check if email already exists
+    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
 
-    return {"status": "error", "msg": "Invalid credentials"}
+    new_user = models.User(
+        email=user.email,
+        password=hash_password(user.password)
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"message": "User registered successfully"}
+
+ 
+@router.post("/login", response_model=schemas.LoginResponse)
+def login(request: schemas.LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(
+        models.User.email == request.email
+    ).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    if not verify_password(request.password, user.password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    return {
+        "id": user.id,
+        "email": user.email
+    }

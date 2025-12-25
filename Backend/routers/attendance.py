@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from database import SessionLocal
 import models
+from sqlalchemy import Date
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; 
 import API from "../api/api";
 
 export default function WorkoutSelect() {
@@ -8,7 +8,7 @@ export default function WorkoutSelect() {
   const nav = useNavigate();
 
   useEffect(() => {
-    API.get("/workout/all").then((res) => setWorkouts(res.data));
+    API.get("/workout/categories").then((res) => setWorkouts(res.data));
   }, []);
 
   return (

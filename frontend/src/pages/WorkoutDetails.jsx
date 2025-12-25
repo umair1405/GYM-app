@@ -1,28 +1,45 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 
 export default function WorkoutDetails() {
   const { id } = useParams();
   const nav = useNavigate();
-  const [workout, setWorkout] = useState(null);
+  const [exercises, setExercises] = useState([]);
 
   useEffect(() => {
-    API.get(`/workout/${id}`).then((res) => setWorkout(res.data));
-  }, []);
+    API.get(`/workout/exercises/${id}`)
+      .then((res) => setExercises(res.data))
+      .catch((err) => console.error(err));
+  }, [id]);
 
-  if (!workout) return <p>Loading...</p>;
+  if (!exercises.length) return <p>Loading...</p>;
 
   return (
     <div style={{ padding: 20 }}>
-      <h2>{workout.name}</h2>
+      <h2>Exercises</h2>
 
-      <img src={workout.photo_url} width="250" />
+      {exercises.map((ex) => (
+        <div key={ex.id} style={{ marginBottom: 20 }}>
+          <h3>{ex.name}</h3>
 
-      <p>{workout.description}</p>
+          <img
+            src={`http://127.0.0.1:8000/images/${ex.image}`}
+            width="250"
+            alt={ex.name}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = "/gymphoto.jpg"; // frontend fallback
+            }}
+          />
 
-      <button onClick={() => nav("/checkout")}>Finish Workout</button>
+          <p>{ex.description}</p>
+        </div>
+      ))}
+
+      <button onClick={() => nav("/checkout")}>
+        Finish Workout
+      </button>
     </div>
   );
 }

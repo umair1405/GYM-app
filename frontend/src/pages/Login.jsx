@@ -1,74 +1,79 @@
+// frontend/src/pages/Login.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 
-function Login() {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const nav = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:8000/auth/login",
-        new URLSearchParams({
-          email: email,
-          password: password,
-        }),
-        {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" }
-        }
-      );
+      const res = await axios.post("http://127.0.0.1:8000/auth/login", {
+        email,
+        password,
+      });
 
-      console.log("API Response:", response.data);
-
-      if (response.data.status === "success") {
-        alert("Login successful!");
-      } else {
-        alert("Invalid username or password");
-      }
-
+      console.log("login success", res.data);
+      localStorage.setItem("user_id", res.data.user_id);
+      nav("/checkin"); // or dashboard
     } catch (err) {
-      console.error("Login error:", err);
-      alert("Error connecting to server");
+      alert(err?.response?.data?.detail || "Invalid username or password");
     }
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Login</h2>
+    <div style={styles.container}>
+      <h2>Sign In</h2>
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Email</label><br />
-          <input
-            type="email"
-            placeholder="Enter email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
 
-        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
 
-        <div>
-          <label>Password</label><br />
-          <input
-            type="password"
-            placeholder="Enter password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <br />
-
-        <button type="submit">Login</button>
+        <button type="submit">Sign In</button>
       </form>
+
+      <p style={{ marginTop: 10 }}>
+        Don’t have an account?{" "}
+        <Link to="/register" style={styles.link}>
+          Create Account
+        </Link>
+      </p>
     </div>
   );
 }
 
-export default Login;
+const styles = {
+  container: {
+    maxWidth: 350,
+    margin: "100px auto",
+    padding: 20,
+    border: "1px solid #ddd",
+    borderRadius: 6,
+    textAlign: "center",
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  link: {
+    color: "#007bff",
+    textDecoration: "none",
+  },
+};

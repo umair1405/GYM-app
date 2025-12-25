@@ -90,5 +90,7 @@ def add_exercise(category_id: int, name: str, image_url: str, description: str, 
     db.add(new_ex)
     db.commit()
     db.refresh(new_ex)
-
+    
     return {"message": "Exercise added", "id": new_ex.id}
+
+ 

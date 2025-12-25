@@ -1,17 +1,14 @@
+# backend/database.py
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 import os
+from sqlalchemy.ext.declarative import declarative_base
+load_dotenv()  # loads .env in backend folder
 
-# Load variables from .env file
-load_dotenv()
-
-# Read the DATABASE_URL from .env
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL is missing. Check your .env file.")
+DATABASE_URL = "postgresql://postgres:monu1@localhost:5432/gymdb1"
 
 engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(bind=engine)
-Base = declarative_base()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()   
